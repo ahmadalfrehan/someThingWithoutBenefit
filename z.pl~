@@ -28,23 +28,19 @@ light(1,7).
 cell(X,Y):-X>0,X<9,Y>0,Y<9.
 
 neighbor(X,Y,NX,Y):-
-    NX is X-1,
-    cell(NX,Y).
+    NX is X-1.
 
 neighbor(X,Y,NX,Y):-
-    NX is X+1,
-    cell(NX,Y).
+    NX is X+1.
 
 neighbor(X,Y,X,NY) :-
-    NY is Y-1,
-    cell(X,NY).
+    NY is Y-1.
 
 neighbor(X,Y,X,NY) :-
-    NY is Y+1,
-    cell(X,NY).
+    NY is Y+1.
 
 neighbors(X,Y,L) :-
-    findall(neighbor(NX,NY),neighbor(X,Y,NX,NY),L).
+    findall(neighbor(X,Y),L).
 
 
 
@@ -123,7 +119,7 @@ cellDownForLight(Y,X,L,R):-Y1 is Y - 1,cell(Y1,X),LengthLight(L,R),
 
 cellRightFourth(_,_).
 
-islight(X,Y):-light(X,Y).
+%islight(X,Y):-light(X,Y).
 
 cellRightFourth(X,Y):-X1 is X + 1, cell(X1,Y),not(wall(X1,Y)),
     not(wall_num(X1,Y,_)),
@@ -131,7 +127,7 @@ cellRightFourth(X,Y):-X1 is X + 1, cell(X1,Y),not(wall(X1,Y)),
 
 
 cellLeftFourth(_,_).
-islight(X,Y):-light(X,Y).
+%islight(X,Y):-light(X,Y).
 cellLeftFourth(X,Y):-X1 is X - 1,cell(X1,Y),not(wall(X1,Y)),
     not(wall_num(X1,Y,_)),
     islight(X,Y);cellLeftFourth(X1,Y,L1).
@@ -140,14 +136,14 @@ cellLeftFourth(X,Y):-X1 is X - 1,cell(X1,Y),not(wall(X1,Y)),
 %exRow(X,Y,L):- cellRight(X,Y,L1), cellLeft(X,Y,L2), append(L1,L2,L).
 
 cellUpFourth(_,_).
-islight(X,Y):-light(X,Y).
+%islight(X,Y):-light(X,Y).
 cellUpFourth(Y,X):- Y1 is Y + 1, cell(Y1,X), not(wall(Y1,X)),
     not(wall_num(Y1,X,_)),islight(X,Y);cellUpFourth(Y1,X);islight(X,Y).
 
 %append([[Y1,X]],L1,L).
 
 cellDownFourth(_,_).
-islight(X,Y):-light(X,Y).
+%islight(X,Y):-light(X,Y).
 cellDownFourth(Y,X):-  Y1 is Y - 1, cell(Y1,X), not(wall(Y1,X)),
     not(wall_num(Y1,X,_)),islight(X,Y);cellDown(Y1,X,L1).
 
@@ -157,20 +153,23 @@ cellLeftFourth(X,Y);
 cellUpFourth(X,Y);
 cellDownFourth(X,Y).
 
-%append([[Y1,X]],L1,L).
+%fifth
+light2([],_).
+
+light2([H|T],X):-light([H]),X1 is X+1,light2(T,X1).
+
+findCount(X,Y,L):-neighbors(X,Y,L),light2(L,X),X =\ wall_num(_,_,Z).
 
 
+
+%append([[Y1,X]],L1,L)
 %
-% exRowLight(Y,X,L):-cellUpForLight(Y,X,L1),cellDownForLight(Y,X,L2),
-% append(L1,L2,L).
+%exRowLight(Y,X,L):-cellUpForLight(Y,X,L1),cellDownForLight(Y,X,L2),
+%append(L1,L2,L).
 %
 
 
-
-
-
-
-
+%fiftyth algorathem
 
 
 neighbors(X,Y,L):-cell(X,Y),
@@ -187,11 +186,7 @@ grid_row(R,N,Row) :- M is N-7,R1 is R + 1 ,cell(R1, M),grid_row(R1, M,Row).
 collect(R,N,M):-findall((Row),grid_row(R,N,Row),M).
 
 
-
-
-
-
-
+% ========================================================================
 
 
 
