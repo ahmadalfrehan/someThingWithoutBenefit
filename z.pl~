@@ -48,7 +48,9 @@ neighbors(X,Y,L) :-
 
 
 
-rowAnd:- call1(......, L1), call2(.......,L2), append(L1,L2,L).
+%rowAnd:- call1(......, L1), call2(.......,L2), append(L1,L2,L).
+
+%second algorithm
 
 
 cellRight(X,Y,L):-  X1 is X + 1, cell(X1,Y), not(wall(X1,Y)), not(wall_num(X1,Y,_)), cellRight(X1,Y,L1), append([[X1,Y]],L1,L).
@@ -67,10 +69,10 @@ cellUp(_,_,[]).
 
 cellDown(Y,X,L):-  Y1 is Y - 1, cell(Y1,X), not(wall(Y1,X)), not(wall_num(Y1,X,_)), cellDown(Y1,X,L1), append([[Y1,X]],L1,L).
 
-cellDOWN(_,_,[]).
+cellDown(_,_,[]).
 
-counter([],0).
-counter([T|H],C):-C1 is C+1,counter(H,C1).
+%counter([],0).
+%counter([T|H],C):-C1 is C+1,counter(H,C1).
 
 exRow(Y,X,L):-cellUp(Y,X,L1),cellDown(Y,X,L2), append(L1,L2,L).
 
@@ -89,38 +91,79 @@ isLighted(X,Y):-light(X,Y);(emptyCell(X,Y),allCells(X,Y,Z),lenLight(Z,B),B > 0).
 lengthLight([],0).
 
 lengthLight([H|T],N):- lengthLight(T,N1),((isLight(H))-> N is N1+1; N is N1).
-isLight([N,M|_]):-light(N,M).
 
-
-cellRightForLight(X,Y,L,R):-X1 is X + 1,cell(X1,Y),lengthLight(L,R),
-    cellRightForLight(Y,X1,L1),
- append([[Y,X1]],L1,L).
+light([N,M|_]):-light(N,M).
 
 cellRightForLight(_,_,[],0).
 
-cellLeftForLight(X,Y,L,R):-  X1 is X - 1, cell(X1,Y),lengthLight(L,R),cellLeftForLight(X1,Y,L1), append([[X1,Y]],L1,L).
+cellRightForLight(X,Y,L,R):-X1 is X + 1,cell(X1,Y),lengthLight(L,R),
+    cellRightForLight(Y,X1,L1),
+% append([[Y,X1]],L1,L).
+%
 
 cellLeftForLight(_,_,[],0).
 
+cellLeftForLight(X,Y,L,R):-  X1 is X - 1, cell(X1,Y),lengthLight(L,R),
+    cellLeftForLight(X1,Y,L1).% append([[X1,Y]],L1,L).
 
-
-exRowLight(X,Y,L,R):- cellRightForLight(X,Y,L1,R), cellLeftForLight(X,Y,L2,R), append(L1,L2,L).
-
-
-cellUpForLight(Y,X,L,R):- Y1 is Y + 1,cell(Y1,X),lengthLight(L,R),cellUpForLight(Y1,X,L1,R).    %append([[Y1,X]],L1,L).
+% exRowLight(X,Y,L,R):- cellRightForLight(X,Y,L1,R),
+% cellLeftForLight(X,Y,L2,R), append(L1,L2,L).
+%
 cellUpForLight(_,_,[],0).
 
-cellDownForLight(Y,X,L,R):-  Y1 is Y - 1,cell(Y1,X),LengthLight(L,R),
+cellUpForLight(Y,X,L,R):- Y1 is Y + 1,cell(Y1,X),lengthLight(L,R),cellUpForLight(Y1,X,L1,R).    %append([[Y1,X]],L1,L).
+
+cellDownForLight(_,_,[],0).
+
+cellDownForLight(Y,X,L,R):-Y1 is Y - 1,cell(Y1,X),LengthLight(L,R),
     cellDownForLight(Y1,X,L,R).
+
+%Fourth algorithm
+
+
+cellRightFourth(_,_).
+
+islight(X,Y):-light(X,Y).
+
+cellRightFourth(X,Y):-X1 is X + 1, cell(X1,Y),not(wall(X1,Y)),
+    not(wall_num(X1,Y,_)),
+    islight(X,Y);cellRightFourth(X1,Y,L1).
+
+
+cellLeftFourth(_,_).
+islight(X,Y):-light(X,Y).
+cellLeftFourth(X,Y):-X1 is X - 1,cell(X1,Y),not(wall(X1,Y)),
+    not(wall_num(X1,Y,_)),
+    islight(X,Y);cellLeftFourth(X1,Y,L1).
+
+
+%exRow(X,Y,L):- cellRight(X,Y,L1), cellLeft(X,Y,L2), append(L1,L2,L).
+
+cellUpFourth(_,_).
+islight(X,Y):-light(X,Y).
+cellUpFourth(Y,X):- Y1 is Y + 1, cell(Y1,X), not(wall(Y1,X)),
+    not(wall_num(Y1,X,_)),islight(X,Y);cellUpFourth(Y1,X);islight(X,Y).
 
 %append([[Y1,X]],L1,L).
 
-cellDownForLight(_,_,[]).
+cellDownFourth(_,_).
+islight(X,Y):-light(X,Y).
+cellDownFourth(Y,X):-  Y1 is Y - 1, cell(Y1,X), not(wall(Y1,X)),
+    not(wall_num(Y1,X,_)),islight(X,Y);cellDown(Y1,X,L1).
+
+allWeAreNotTheCell(X,Y):-
+    cellRightFourth(X,Y);
+cellLeftFourth(X,Y);
+cellUpFourth(X,Y);
+cellDownFourth(X,Y).
+
+%append([[Y1,X]],L1,L).
 
 
-exRowLight(Y,X,L):-cellUpForLight(Y,X,L1),cellDownForLight(Y,X,L2), append(L1,L2,L).
-
-
+%
+% exRowLight(Y,X,L):-cellUpForLight(Y,X,L1),cellDownForLight(Y,X,L2),
+% append(L1,L2,L).
+%
 
 
 
