@@ -1,23 +1,3 @@
-neighbor(X,Y,NX,Y):-
-    NX is X-1,
-    cell(NX,Y).
-
-neighbor(X,Y,NX,Y):-
-    NX is X+1,
-    cell(NX,Y).
-
-neighbor(X,Y,X,NY) :-
-    NY is Y-1,
-    cell(X,NY).
-
-neighbor(X,Y,X,NY) :-
-    NY is Y+1,
-    cell(X,NY).
-
-neighbors(X,Y,L) :-
-    findall(neighbor(NX,NY),neighbor(X,Y,NX,NY),L).
-
-
 size(Rows,Columns).
 size(8,8).
 wall(Rows,Columns).
@@ -41,12 +21,114 @@ wall_num(5,8,0).
 wall_num(6,2,2).
 wall_num(7,6,1).
 
+
 light(1,1).
 light(1,5).
-lght(1,7).
-
-
+light(1,7).
 cell(X,Y):-X>0,X<9,Y>0,Y<9.
+
+neighbor(X,Y,NX,Y):-
+    NX is X-1,
+    cell(NX,Y).
+
+neighbor(X,Y,NX,Y):-
+    NX is X+1,
+    cell(NX,Y).
+
+neighbor(X,Y,X,NY) :-
+    NY is Y-1,
+    cell(X,NY).
+
+neighbor(X,Y,X,NY) :-
+    NY is Y+1,
+    cell(X,NY).
+
+neighbors(X,Y,L) :-
+    findall(neighbor(NX,NY),neighbor(X,Y,NX,NY),L).
+
+
+
+rowAnd:- call1(......, L1), call2(.......,L2), append(L1,L2,L).
+
+
+cellRight(X,Y,L):-  X1 is X + 1, cell(X1,Y), not(wall(X1,Y)), not(wall_num(X1,Y,_)), cellRight(X1,Y,L1), append([[X1,Y]],L1,L).
+
+cellRight(_,_,[]).
+
+cellLeft(X,Y,L):-  X1 is X - 1, cell(X1,Y), not(wall(X1,Y)), not(wall_num(X1,Y,_)), cellLeft(X1,Y,L1), append([[X1,Y]],L1,L).
+
+cellLeft(_,_,[]).
+
+exRow(X,Y,L):- cellRight(X,Y,L1), cellLeft(X,Y,L2), append(L1,L2,L).
+
+cellUp(Y,X,L):- Y1 is Y + 1, cell(Y1,X), not(wall(Y1,X)), not(wall_num(Y1,X,_)), cellUp(Y1,X,L1), append([[Y1,X]],L1,L).
+
+cellUp(_,_,[]).
+
+cellDown(Y,X,L):-  Y1 is Y - 1, cell(Y1,X), not(wall(Y1,X)), not(wall_num(Y1,X,_)), cellDown(Y1,X,L1), append([[Y1,X]],L1,L).
+
+cellDOWN(_,_,[]).
+
+counter([],0).
+counter([T|H],C):-C1 is C+1,counter(H,C1).
+
+exRow(Y,X,L):-cellUp(Y,X,L1),cellDown(Y,X,L2), append(L1,L2,L).
+
+
+
+lenLight([H|T],N) :- lenLight(T,X),((isLight(H))-> N is X+1; N is X).
+
+
+isLighted(X,Y):-light(X,Y);(emptyCell(X,Y),allCells(X,Y,Z),lenLight(Z,B),B > 0).
+
+
+%THIRD ALGORITHM
+
+%count the light
+
+lengthLight([],0).
+
+lengthLight([H|T],N):- lengthLight(T,N1),((isLight(H))-> N is N1+1; N is N1).
+isLight([N,M|_]):-light(N,M).
+
+
+cellRightForLight(X,Y,L,R):-X1 is X + 1,cell(X1,Y),lengthLight(L,R),
+    cellRightForLight(Y,X1,L1),
+ append([[Y,X1]],L1,L).
+
+cellRightForLight(_,_,[],0).
+
+cellLeftForLight(X,Y,L,R):-  X1 is X - 1, cell(X1,Y),lengthLight(L,R),cellLeftForLight(X1,Y,L1), append([[X1,Y]],L1,L).
+
+cellLeftForLight(_,_,[],0).
+
+
+
+exRowLight(X,Y,L,R):- cellRightForLight(X,Y,L1,R), cellLeftForLight(X,Y,L2,R), append(L1,L2,L).
+
+
+cellUpForLight(Y,X,L,R):- Y1 is Y + 1,cell(Y1,X),lengthLight(L,R),cellUpForLight(Y1,X,L1,R).    %append([[Y1,X]],L1,L).
+cellUpForLight(_,_,[],0).
+
+cellDownForLight(Y,X,L,R):-  Y1 is Y - 1,cell(Y1,X),LengthLight(L,R),
+    cellDownForLight(Y1,X,L,R).
+
+%append([[Y1,X]],L1,L).
+
+cellDownForLight(_,_,[]).
+
+
+exRowLight(Y,X,L):-cellUpForLight(Y,X,L1),cellDownForLight(Y,X,L2), append(L1,L2,L).
+
+
+
+
+
+
+
+
+
+
 
 neighbors(X,Y,L):-cell(X,Y),
 cell(X+1,Y),X1 is X + 1,Y1 is Y  ,L =[X1,Y1];
@@ -60,3 +142,27 @@ grid_row(R,N,(R,N)) :-size(8,8),\+wall_num(R,N,_),\+wall(R,N).
 grid_row(R,N,Row) :-M is N + 1,cell(R, M),grid_row(R, M, Row).
 grid_row(R,N,Row) :- M is N-7,R1 is R + 1 ,cell(R1, M),grid_row(R1, M,Row).
 collect(R,N,M):-findall((Row),grid_row(R,N,Row),M).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
